@@ -3,25 +3,29 @@
 <head>
     <title>Title</title>
     <style>
-        html{
-            min-width: 650px;
+        html {
+            min-width: 1100px;
         }
-        .form{
+
+        .form {
             margin-top: 50px;
             margin-left: 10%;
             float: left;
         }
-        #graphCanvas{
+
+        #graphCanvas {
             margin-top: 50px;
             margin-right: 10%;
             float: right;
         }
+
         header {
             text-align: center;
             font-size: 36px;
             font-family: "Times New Roman";
         }
-        .container{
+
+        .container {
             height: 500px;
             width: 80%;
             margin-left: 10%;
@@ -34,7 +38,8 @@
             border: 3px solid grey;
             border-radius: 50px;
         }
-        select{
+
+        select {
             box-shadow: 0 0 2px 1px grey;
             border-style: outset;
             align-self: center;
@@ -48,7 +53,8 @@
             border-color: lightgray;
             border-radius: 7px;
         }
-        #textarea{
+
+        #textarea {
             box-shadow: 0 0 2px 1px grey;
             border-width: 2px;
             border-color: lightgray;
@@ -60,10 +66,12 @@
             text-align: center;
             border-radius: 7px;
         }
-        #Y{
+
+        #Y {
             vertical-align: center;
         }
-        button{
+
+        button {
             box-shadow: 0 0 2px 1px grey;
             border-width: 2px;
             border-color: lightgray;
@@ -73,7 +81,8 @@
             border-radius: 7px;
             width: 50px;
         }
-        #accept{
+
+        #accept {
             box-shadow: 0 0 2px 1px grey;
             border-width: 2px;
             border-color: lightgray;
@@ -90,7 +99,7 @@
 <header> Окишор Александр, Р3200, Вариант -...</header>
 <main>
     <div class="container">
-        <div class="canvas" >
+        <div class="canvas">
             <canvas id="graphCanvas" width="400" height="400">Ваш браузер не поддерживает Canvas</canvas>
             <script>
                 var drawingCanvas = document.getElementById("graphCanvas");
@@ -99,14 +108,22 @@
 
                 drawingCanvas.addEventListener('click', function (ev) {
                     let R = document.getElementById("R").value;
-                    if(R === ""){
+                    if (R === "") {
                         R = "R";
                     }
                     drawCanvas(R);
-                    context.strokeStyle = 'rgb(255,0,0)';
-                    context.strokeRect(ev.layerX, ev.layerY, 1, 1);
-                    document.getElementById("X").value = String(ev.layerX);
-                    document.getElementById("Y").value = String(ev.layerY);
+                    let r = parseFloat(R).toFixed(3);
+                    if(isNaN(r)){
+                        alert("r is nan")//todo переделать этот момент
+                    } else {
+                        context.strokeStyle = 'rgb(255,0,0)';
+                        context.strokeRect(ev.offsetX, ev.offsetY, 2, 2);
+                        let x = ((ev.layerX - drawingCanvas.width/2) / 140 * r).toPrecision(3);
+                        let y = ((drawingCanvas.height/2 - ev.layerY) / 140 * r).toPrecision(3);
+                        //todo добавить добавление этих единиц в соответствующие поля
+                        document.getElementById("X").value = String(x);
+                        document.getElementById("Y").value = String(y);
+                    }
                 });
 
                 function drawCanvas(r) {
@@ -120,6 +137,25 @@
                     //todo отрисовка областей
                     context.fillStyle = 'rgb(0,125,255)';
                     context.fillRect(130, 200, 70, 140);
+                    // шаблон треугольника
+                    context.beginPath();
+                    context.moveTo(200,200);
+                    context.lineTo(130, 200);
+                    context.lineTo(200,60);
+                    context.lineTo(200,200);
+                    context.closePath();
+                    context.fill();
+                    // шаблон треугольника
+
+                    //шаблон сектора круга
+                    context.beginPath();
+                    context.moveTo(200,200);
+                    context.lineTo(100, 200);
+                    context.arc(200,200,140,0, Math.PI/2,false);//x и y центра, радиус, начальная точка, конечная точка , против часовой стрелки
+                    context.lineTo(200,200);
+                    context.closePath();
+                    context.fill();
+                    // шаблон сектора круга
                     context.fillStyle = 'rgb(0,0,0)';
                     //todo зависит от варианта
 
@@ -195,22 +231,23 @@
 
                     // пометки значений засечек
                     let halfR;
-                    if(r === "R"){
+                    if (r === "R") {
                         halfR = "R/2"
-                    }else{
-                        halfR = r/2;
+                    } else {
+                        halfR = r / 2;
                     }
                     context.fillText(halfR, 263, 190);
                     context.fillText(halfR, 210, 133);
                     context.fillText(r, 210, 63);
                     context.fillText(r, 337, 190);
-                    context.fillText("-"+halfR, 120, 190);
+                    context.fillText("-" + halfR, 120, 190);
                     context.fillText("-" + halfR, 210, 273);
-                    context.fillText("-"+r, 55, 190);
-                    context.fillText("-"+r, 210, 343);
+                    context.fillText("-" + r, 55, 190);
+                    context.fillText("-" + r, 210, 343);
 
                 }
-                function setR(r){
+
+                function setR(r) {
                     document.getElementById("R").value = r;
                     drawCanvas(r);
                 }
