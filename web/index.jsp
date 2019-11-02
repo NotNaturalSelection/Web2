@@ -120,10 +120,15 @@
                     drawCanvas(R);
                     let r = parseFloat(R).toFixed(3);
                     if (isNaN(r)) {
-                        alert("r is nan")//todo переделать этот момент
+                        alert("R is nan")//todo переделать этот момент
                     } else {
                         context.strokeStyle = 'rgb(255,0,0)';
-                        context.strokeRect(ev.offsetX, ev.offsetY, 2, 2);
+                        context.fillStyle = 'rgb(255,0,0)';
+                        // context.strokeRect(ev.offsetX, ev.offsetY, 2, 2);
+                        context.beginPath();
+                        context.arc(ev.offsetX, ev.offsetY, 2, 0, 2*Math.PI);
+                        context.closePath();
+                        context.fill();
                         let x = ((ev.layerX - drawingCanvas.width / 2) / 140 * r).toPrecision(3);
                         let y = ((drawingCanvas.height / 2 - ev.layerY) / 140 * r).toPrecision(3);
                         //todo добавить добавление этих единиц в соответствующие поля
@@ -306,22 +311,15 @@
                                                  oninput="textareaCheck()">
             <br>
             <p>Координата R:</p>
-                <select>
-                    <optgroup label="Выберите R">
+                <select onchange="setR(this.options[this.selectedIndex].value)" id="R">
+                    <option value="R" selected disabled>R</option>
                     <option value="1">1</option>
                     <option value="1.5">1.5</option>
                     <option value="2">2</option>
                     <option value="2.5">2.5</option>
                     <option value="3">3</option>
-                    </optgroup>
-                </select>
-            <%--            <button type="button" onclick="setR(1)" name="button1" id="button1" value="1">1</button>--%>
-<%--            <button type="button" onclick="setR(2)" name="button2" id="button2" value="2">2</button>--%>
-<%--            <button type="button" onclick="setR(3)" name="button3" id="button3" value="3">3</button>--%>
-<%--            <button type="button" onclick="setR(4)" name="button4" id="button4" value="4">4</button>--%>
-<%--            <button type="button" onclick="setR(5)" name="button5" id="button5" value="5">5</button>--%>
 
-            <textarea name="R" id="R" cols="1" rows="1" maxlength="1" hidden readonly></textarea>
+                </select>
             <p><input type="button" id="accept" value="Применить"></p>
         </div>
     </div>
