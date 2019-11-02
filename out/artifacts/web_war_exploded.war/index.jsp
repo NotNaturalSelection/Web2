@@ -3,8 +3,13 @@
 <head>
     <title>Title</title>
     <style>
+        input[type=checkbox] {
+            cursor: pointer;
+            width: 15px;
+            height: 15px;
+        }
         html {
-            min-width: 1100px;
+            min-width: 1200px;
         }
 
         .form {
@@ -43,9 +48,9 @@
             box-shadow: 0 0 2px 1px grey;
             border-style: outset;
             align-self: center;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
+            /*-webkit-appearance: none;*/
+            /*-moz-appearance: none;*/
+            /*appearance: none;*/
             border-width: 2px;
             height: 30px;
             width: 50px;
@@ -72,6 +77,7 @@
         }
 
         button {
+            cursor: pointer;
             box-shadow: 0 0 2px 1px grey;
             border-width: 2px;
             border-color: lightgray;
@@ -96,195 +102,228 @@
     </style>
 </head>
 <body>
-<header> Окишор Александр, Р3200, Вариант -...</header>
+<header> Окишор Александр, Р3200, Вариант 200026</header>
 <main>
     <div class="container">
         <div class="canvas">
             <canvas id="graphCanvas" width="400" height="400">Ваш браузер не поддерживает Canvas</canvas>
+            <script>
+                var drawingCanvas = document.getElementById("graphCanvas");
+                var context = drawingCanvas.getContext("2d");
+                drawCanvas("R");
 
+                drawingCanvas.addEventListener('click', function (ev) {
+                    let R = document.getElementById("R").value;
+                    if (R === "") {
+                        R = "R";
+                    }
+                    drawCanvas(R);
+                    let r = parseFloat(R).toFixed(3);
+                    if (isNaN(r)) {
+                        alert("r is nan")//todo переделать этот момент
+                    } else {
+                        context.strokeStyle = 'rgb(255,0,0)';
+                        context.strokeRect(ev.offsetX, ev.offsetY, 2, 2);
+                        let x = ((ev.layerX - drawingCanvas.width / 2) / 140 * r).toPrecision(3);
+                        let y = ((drawingCanvas.height / 2 - ev.layerY) / 140 * r).toPrecision(3);
+                        //todo добавить добавление этих единиц в соответствующие поля
+                        document.getElementById("X").value = String(x);
+                        document.getElementById("Y").innerText = String(y);
+                    }
+                });
+
+                function drawCanvas(r) {
+                    context.clearRect(0, 0, 400, 400);
+                    context.strokeStyle = 'rgb(0,0,0)';
+                    context.strokeRect(0, 0, 400, 400);
+                    context.lineWidth = 2;
+                    context.font = "small-caps 12px Arial";
+
+                    //отрисовка области
+                    //todo отрисовка областей
+                    context.fillStyle = 'rgb(0,155,255)';
+                    context.fillRect(200, 130, 140, 70);
+                    // шаблон треугольника
+                    context.beginPath();
+                    context.moveTo(200, 200);
+                    context.lineTo(60, 200);
+                    context.lineTo(200, 60);
+                    context.lineTo(200, 200);
+                    context.closePath();
+                    context.fill();
+                    // шаблон треугольника
+
+                    //шаблон сектора круга
+                    context.beginPath();
+                    context.moveTo(200, 200);
+                    context.lineTo(200, 100);
+                    context.arc(200, 200, 70, Math.PI / 2, Math.PI, false);//x и y центра, радиус, начальная точка, конечная точка , против часовой стрелки
+                    context.lineTo(200, 200);
+                    context.closePath();
+                    context.fill();
+                    // шаблон сектора круга
+                    context.fillStyle = 'rgb(0,0,0)';
+                    //todo зависит от варианта
+
+                    // ось  у
+                    context.beginPath();
+                    context.moveTo(200, 400);
+                    context.lineTo(200, 0);
+                    context.closePath();
+                    context.stroke();
+
+                    // стрелка оси у
+                    context.beginPath();
+                    context.moveTo(200, 0);
+                    context.lineTo(195, 10);
+                    context.moveTo(200, 0);
+                    context.lineTo(205, 10);
+                    context.closePath();
+                    context.stroke();
+
+                    // ось х
+                    context.beginPath();
+                    context.moveTo(0, 200);
+                    context.lineTo(400, 200);
+                    context.closePath();
+                    context.stroke();
+
+                    // стрелки оси х
+                    context.beginPath();
+                    context.moveTo(400, 200);
+                    context.lineTo(390, 195);
+                    context.moveTo(400, 200);
+                    context.lineTo(390, 205);
+                    context.closePath();
+                    context.stroke();
+
+                    // буквы х и у
+                    context.fillText("X", 387, 190);
+                    context.fillText("Y", 210, 13);
+
+                    // засечики на оси X
+                    context.beginPath();
+                    context.moveTo(270, 195);
+                    context.lineTo(270, 205);
+                    context.moveTo(340, 195);
+                    context.lineTo(340, 205);
+                    context.closePath();
+                    context.stroke();
+
+                    context.beginPath();
+                    context.moveTo(130, 195);
+                    context.lineTo(130, 205);
+                    context.moveTo(60, 195);
+                    context.lineTo(60, 205);
+                    context.closePath();
+                    context.stroke();
+
+                    // засечки на оси Y
+                    context.beginPath();
+                    context.moveTo(195, 130);
+                    context.lineTo(205, 130);
+                    context.moveTo(195, 60);
+                    context.lineTo(205, 60);
+                    context.closePath();
+                    context.stroke();
+
+                    context.beginPath();
+                    context.moveTo(195, 270);
+                    context.lineTo(205, 270);
+                    context.moveTo(195, 340);
+                    context.lineTo(205, 340);
+                    context.closePath();
+                    context.stroke();
+
+                    // пометки значений засечек
+                    let halfR;
+                    if (r === "R") {
+                        halfR = "R/2"
+                    } else {
+                        halfR = r / 2;
+                    }
+                    context.fillText(halfR, 263, 190);
+                    context.fillText(halfR, 210, 133);
+                    context.fillText(r, 210, 63);
+                    context.fillText(r, 337, 190);
+                    context.fillText("-" + halfR, 120, 190);
+                    context.fillText("-" + halfR, 210, 273);
+                    context.fillText("-" + r, 55, 190);
+                    context.fillText("-" + r, 210, 343);
+
+                }
+
+                function setR(r) {
+                    document.getElementById("R").value = r;
+                    drawCanvas(r);
+                }
+
+                function textareaCheck() {
+                    let input = document.getElementById("textarea").value;
+                    if (input.indexOf(',') !== -1) {
+                        input = input.replace(',', '.');
+                        document.getElementById("textarea").value = input.toString();
+                    }
+                }
+            </script>
         </div>
         <div class="form">
             <p>Координата X</p>
             <p>
-                <select name="X" id="X">
-                    <option value="-4">-4</option>
-                    <option value="-3">-3</option>
-                    <option value="-2">-2</option>
-                    <option value="-1">-1</option>
-                    <option value="0">0</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                </select>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" value="-3"/>-3
+                </label>
+                <label>
+                    <input type="checkbox" value="-2"/>-2
+                </label>
+                <label>
+                    <input type="checkbox" value="-1"/>-1
+                </label>
+                <label>
+                    <input type="checkbox" value="0"/>0
+                </label>
+                <label>
+                    <input type="checkbox" value="1"/>1
+                </label>
+                <label>
+                    <input type="checkbox" value="2"/>2
+                </label>
+                <label>
+                    <input type="checkbox" value="3"/>3
+                </label>
+                <label>
+                    <input type="checkbox" value="4"/>4
+                </label>
+                <label>
+                    <input type="checkbox" value="5"/>5
+                </label>
+            </div>
             </p>
             <p>Координата Y</p>
-            <label for="textarea"></label><input type="text" placeholder="-5...5" name="textarea" id="textarea"
-                                                 onchange="textAreaHandler()"
-                                                 onkeydown="if(event.keyCode===13){return false;}">
-            <p>Значение Y:</p>
-            <p id="Y">?</p>
-            <p>Координата R</p>
-            <button type="button" onclick="setR(1)" name="button1" id="button1" value="1">1</button>
-            <button type="button" onclick="setR(2)" name="button2" id="button2" value="2">2</button>
-            <button type="button" onclick="setR(3)" name="button3" id="button3" value="3">3</button>
-            <button type="button" onclick="setR(4)" name="button4" id="button4" value="4">4</button>
-            <button type="button" onclick="setR(5)" name="button5" id="button5" value="5">5</button>
+            <label for="textarea"></label><input type="text" placeholder="-3...5" name="textarea" id="textarea"
+                                                 onkeydown="if(event.keyCode===13){return false;}"
+                                                 oninput="textareaCheck()">
+            <br>
+            <p>Координата R:</p>
+                <select>
+                    <optgroup label="Выберите R">
+                    <option value="1">1</option>
+                    <option value="1.5">1.5</option>
+                    <option value="2">2</option>
+                    <option value="2.5">2.5</option>
+                    <option value="3">3</option>
+                </select>
+            <%--            <button type="button" onclick="setR(1)" name="button1" id="button1" value="1">1</button>--%>
+<%--            <button type="button" onclick="setR(2)" name="button2" id="button2" value="2">2</button>--%>
+<%--            <button type="button" onclick="setR(3)" name="button3" id="button3" value="3">3</button>--%>
+<%--            <button type="button" onclick="setR(4)" name="button4" id="button4" value="4">4</button>--%>
+<%--            <button type="button" onclick="setR(5)" name="button5" id="button5" value="5">5</button>--%>
+
             <textarea name="R" id="R" cols="1" rows="1" maxlength="1" hidden readonly></textarea>
             <p><input type="button" id="accept" value="Применить"></p>
         </div>
     </div>
-    <script>
-        var drawingCanvas = document.getElementById("graphCanvas");
-        var context = drawingCanvas.getContext("2d");
-        drawCanvas("R");
-
-        drawingCanvas.addEventListener('click', function (ev) {
-            let R = document.getElementById("R").value;
-            if (R === "") {
-                R = "R";
-            }
-            drawCanvas(R);
-            let r = parseFloat(R).toFixed(3);
-            if(isNaN(r)){
-                alert("r is nan")//todo переделать этот момент
-            } else {
-                context.strokeStyle = 'rgb(255,0,0)';
-                context.strokeRect(ev.offsetX, ev.offsetY, 2, 2);
-                let x = ((ev.layerX - drawingCanvas.width/2) / 140 * r).toPrecision(3);
-                let y = ((drawingCanvas.height/2 - ev.layerY) / 140 * r).toPrecision(3);
-                //todo добавить добавление этих единиц в соответствующие поля
-                document.getElementById("X").value = String(x);
-                document.getElementById("Y").value = String(y);
-            }
-        });
-
-        function drawCanvas(r) {
-            context.clearRect(0, 0, 400, 400);
-            context.strokeStyle = 'rgb(0,0,0)';
-            context.strokeRect(0, 0, 400, 400);
-            context.lineWidth = 2;
-            context.font = "small-caps 12px Arial";
-
-            //отрисовка области
-            //todo отрисовка областей
-            context.fillStyle = 'rgb(0,125,255)';
-            context.fillRect(130, 200, 70, 140);
-            // шаблон треугольника
-            context.beginPath();
-            context.moveTo(200,200);
-            context.lineTo(130, 200);
-            context.lineTo(200,60);
-            context.lineTo(200,200);
-            context.closePath();
-            context.fill();
-            // шаблон треугольника
-
-            //шаблон сектора круга
-            context.beginPath();
-            context.moveTo(200,200);
-            context.lineTo(100, 200);
-            context.arc(200,200,140,0, Math.PI/2,false);//x и y центра, радиус, начальная точка, конечная точка , против часовой стрелки
-            context.lineTo(200,200);
-            context.closePath();
-            context.fill();
-            // шаблон сектора круга
-            context.fillStyle = 'rgb(0,0,0)';
-            //todo зависит от варианта
-
-            // ось  у
-            context.beginPath();
-            context.moveTo(200, 400);
-            context.lineTo(200, 0);
-            context.closePath();
-            context.stroke();
-
-            // стрелка оси у
-            context.beginPath();
-            context.moveTo(200, 0);
-            context.lineTo(195, 10);
-            context.moveTo(200, 0);
-            context.lineTo(205, 10);
-            context.closePath();
-            context.stroke();
-
-            // ось х
-            context.beginPath();
-            context.moveTo(0, 200);
-            context.lineTo(400, 200);
-            context.closePath();
-            context.stroke();
-
-            // стрелки оси х
-            context.beginPath();
-            context.moveTo(400, 200);
-            context.lineTo(390, 195);
-            context.moveTo(400, 200);
-            context.lineTo(390, 205);
-            context.closePath();
-            context.stroke();
-
-            // буквы х и у
-            context.fillText("X", 387, 190);
-            context.fillText("Y", 210, 13);
-
-            // засечики на оси X
-            context.beginPath();
-            context.moveTo(270, 195);
-            context.lineTo(270, 205);
-            context.moveTo(340, 195);
-            context.lineTo(340, 205);
-            context.closePath();
-            context.stroke();
-
-            context.beginPath();
-            context.moveTo(130, 195);
-            context.lineTo(130, 205);
-            context.moveTo(60, 195);
-            context.lineTo(60, 205);
-            context.closePath();
-            context.stroke();
-
-            // засечки на оси Y
-            context.beginPath();
-            context.moveTo(195, 130);
-            context.lineTo(205, 130);
-            context.moveTo(195, 60);
-            context.lineTo(205, 60);
-            context.closePath();
-            context.stroke();
-
-            context.beginPath();
-            context.moveTo(195, 270);
-            context.lineTo(205, 270);
-            context.moveTo(195, 340);
-            context.lineTo(205, 340);
-            context.closePath();
-            context.stroke();
-
-            // пометки значений засечек
-            let halfR;
-            if (r === "R") {
-                halfR = "R/2"
-            } else {
-                halfR = r / 2;
-            }
-            context.fillText(halfR, 263, 190);
-            context.fillText(halfR, 210, 133);
-            context.fillText(r, 210, 63);
-            context.fillText(r, 337, 190);
-            context.fillText("-" + halfR, 120, 190);
-            context.fillText("-" + halfR, 210, 273);
-            context.fillText("-" + r, 55, 190);
-            context.fillText("-" + r, 210, 343);
-
-        }
-
-        function setR(r) {
-            document.getElementById("R").value = r;
-            drawCanvas(r);
-        }
-    </script>
 </main>
 </body>
 </html>
