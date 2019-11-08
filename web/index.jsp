@@ -1,4 +1,6 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="beans.Point" %>
+<%@ page contentType="text/html;charset=UTF-8" %>
+<jsp:useBean id="array" class="beans.PointBean" scope="application"/>
 <html>
 <head>
     <title>Title</title>
@@ -8,6 +10,7 @@
             width: 15px;
             height: 15px;
         }
+
         html {
             min-width: 1200px;
         }
@@ -27,7 +30,7 @@
         header {
             text-align: center;
             font-size: 36px;
-            font-family: "Times New Roman";
+            font-family: "Times New Roman", serif;
         }
 
         .container {
@@ -99,6 +102,34 @@
             height: 30px;
             width: 200px;
         }
+
+        table {
+            align-self: center;
+            background-color: azure;
+            font-size: 20px;
+            border: 1px solid grey;
+            border-radius: 7px;
+            column-gap: 2px;
+            column-rule: 7px grey;
+            width: 50%;
+            margin-left: 25%;
+            margin-right: 25%;
+            margin-top: 20%;
+        }
+
+        td, th {
+            text-align: center;
+            background-color: lightblue;
+            width: 5%;
+        }
+
+        tr {
+            background-color: lightyellow;
+        }
+
+        .table {
+            padding-top: 12%;
+        }
     </style>
 </head>
 <body>
@@ -120,15 +151,21 @@
                     drawCanvas(R);
                     let r = parseFloat(R).toFixed(3);
                     if (isNaN(r)) {
-                        alert("R is nan")//todo переделать этот момент
+                        document.getElementById("R").style = 'background-color: #ff8282;';
+                        let incr = 1;
+                        while (incr < document.getElementById("R").options.length) {
+                            document.getElementById("R").options.item(incr).style = 'background-color: lightblue;';
+                            incr++;
+                        }
                     } else {
+
                         context.strokeStyle = 'rgb(255,0,0)';
                         context.fillStyle = 'rgb(255,0,0)';
-                        // context.strokeRect(ev.offsetX, ev.offsetY, 2, 2);
                         context.beginPath();
-                        context.arc(ev.offsetX, ev.offsetY, 2, 0, 2*Math.PI);
+                        context.arc(ev.offsetX, ev.offsetY, 2, 0, 2 * Math.PI);
                         context.closePath();
                         context.fill();
+
                         let x = ((ev.layerX - drawingCanvas.width / 2) / 140 * r).toPrecision(3);
                         let y = ((drawingCanvas.height / 2 - ev.layerY) / 140 * r).toPrecision(3);
                         //todo добавить добавление этих единиц в соответствующие поля
@@ -259,7 +296,8 @@
                 }
 
                 function setR(r) {
-                    document.getElementById("R").value = r;
+                    document.getElementById("R").style = 'background-color: lightblue;';
+                    document.getElementById("R").options.remove(0);
                     drawCanvas(r);
                 }
 
@@ -270,58 +308,85 @@
                         document.getElementById("textarea").value = input.toString();
                     }
                 }
+
+                function validation() {
+                    let textarea = document.getElementById("textarea").value
+                }
             </script>
         </div>
         <div class="form">
-            <p>Координата X</p>
-            <p>
-            <div class="checkbox">
+            <form action="controllerServlet" method="get">
+                <p>Координата X</p>
                 <label>
-                    <input type="checkbox" value="-3"/>-3
+                    <input type="checkbox" name="checkbox[]" value="-3"/>-3
                 </label>
                 <label>
-                    <input type="checkbox" value="-2"/>-2
+                    <input type="checkbox" name="checkbox[]" value="-2"/>-2
                 </label>
                 <label>
-                    <input type="checkbox" value="-1"/>-1
+                    <input type="checkbox" name="checkbox[]" value="-1"/>-1
                 </label>
                 <label>
-                    <input type="checkbox" value="0"/>0
+                    <input type="checkbox" name="checkbox[]" value="0"/>0
                 </label>
                 <label>
-                    <input type="checkbox" value="1"/>1
+                    <input type="checkbox" name="checkbox[]" value="1"/>1
                 </label>
                 <label>
-                    <input type="checkbox" value="2"/>2
+                    <input type="checkbox" name="checkbox[]" value="2"/>2
                 </label>
                 <label>
-                    <input type="checkbox" value="3"/>3
+                    <input type="checkbox" name="checkbox[]" value="3"/>3
                 </label>
                 <label>
-                    <input type="checkbox" value="4"/>4
+                    <input type="checkbox" name="checkbox[]" value="4"/>4
                 </label>
                 <label>
-                    <input type="checkbox" value="5"/>5
+                    <input type="checkbox" name="checkbox[]" value="5"/>5
                 </label>
-            </div>
-            </p>
-            <p>Координата Y</p>
-            <label for="textarea"></label><input type="text" placeholder="-3...5" name="textarea" id="textarea"
-                                                 onkeydown="if(event.keyCode===13){return false;}"
-                                                 oninput="textareaCheck()">
-            <br>
-            <p>Координата R:</p>
-                <select onchange="setR(this.options[this.selectedIndex].value)" id="R">
+                <p>Координата Y</p>
+                <label for="textarea"></label><input type="text" placeholder="-3...5" name="textarea" id="textarea"
+                                                     onkeydown="if(event.keyCode===13){return false;}"
+                                                     oninput="textareaCheck()">
+                <p>Координата R:</p>
+                <label for="R"></label>
+                <select name="select" onchange="setR(this.options[this.selectedIndex].value)" id="R" required>
                     <option value="R" selected disabled>R</option>
                     <option value="1">1</option>
                     <option value="1.5">1.5</option>
                     <option value="2">2</option>
                     <option value="2.5">2.5</option>
                     <option value="3">3</option>
-
                 </select>
-            <p><input type="button" id="accept" value="Применить"></p>
+                <p><input type="submit" id="accept" value="Применить"></p>
+            </form>
         </div>
+    </div>
+    <div class="table">
+        <table>
+            <%
+                StringBuilder builder = new StringBuilder();
+                builder.append("<tr>");
+                builder.append("<th>").append("X").append("</th>");
+                builder.append("<th>").append("Y").append("</th>");
+                builder.append("<th>").append("R").append("</th>");
+                builder.append("<th>").append("Result").append("</th>");
+                builder.append("</tr>");
+                for (Point point : array.getArray()) {
+                    builder.append("<tr>");
+                    builder.append("<td>").append(point.getX()).append("</td>");
+                    builder.append("<td>").append(point.getY()).append("</td>");
+                    builder.append("<td>").append(point.getR()).append("</td>");
+                    if (point.isHit()) {
+                        builder.append("<td style='background-color: lightgreen;'>").append(point.isHit()).append("</td>");
+                    } else {
+                        builder.append("<td style='background-color: lightcoral;'>").append(point.isHit()).append("</td>");
+                    }
+                    builder.append("</tr>");
+                }
+                out.println(builder.toString());
+            %>
+        </table>
     </div>
 </main>
 </body>
