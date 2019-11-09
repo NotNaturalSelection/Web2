@@ -4,6 +4,7 @@
 <html>
 <head>
     <title>Title</title>
+    <script src="js/jquery.js"></script>
     <style>
         input[type=checkbox] {
             cursor: pointer;
@@ -75,10 +76,6 @@
             border-radius: 7px;
         }
 
-        #Y {
-            vertical-align: center;
-        }
-
         button {
             cursor: pointer;
             box-shadow: 0 0 2px 1px grey;
@@ -123,7 +120,8 @@
             width: 5%;
             border-radius: 5px;
         }
-        th{
+
+        th {
             background-color: gold;
         }
 
@@ -192,7 +190,7 @@
         </div>
     </div>
     <div class="table">
-        <table>
+        <table id="table">
             <%
                 StringBuilder builder = new StringBuilder();
                 builder.append("<tr>");
@@ -245,17 +243,9 @@
             context.arc(ev.offsetX, ev.offsetY, 2, 0, 2 * Math.PI);
             context.closePath();
             context.fill();
-
-
-            //todo засунуть это в ajax
-
             let x = ((ev.layerX - drawingCanvas.width / 2) / 140 * r).toPrecision(3);
             let y = ((drawingCanvas.height / 2 - ev.layerY) / 140 * r).toPrecision(3);
-            //todo добавить добавление этих единиц в соответствующие поля
-            document.forms.item(0).elements.namedItem("checkbox[]").item(0).value = x;
-            document.forms.item(0).elements.namedItem("checkbox[]").item(0).checked = true;
-            document.getElementById("textarea").value = String(y);
-            document.forms.item(0).submit();
+            request(x, y, r);
         }
     });
 
@@ -267,7 +257,6 @@
         context.font = "small-caps 12px Arial";
 
         //отрисовка области
-        //todo отрисовка областей
         context.fillStyle = 'rgb(0,155,255)';
         context.fillRect(200, 130, 140, 70);
         // шаблон треугольника
@@ -289,8 +278,8 @@
         context.closePath();
         context.fill();
         // шаблон сектора круга
+
         context.fillStyle = 'rgb(0,0,0)';
-        //todo зависит от варианта
 
         // ось  у
         context.beginPath();
@@ -382,7 +371,9 @@
 
     function setR(r) {
         document.getElementById("R").style = 'background-color: lightblue;';
-        document.getElementById("R").options.remove(0);
+        if(document.getElementById("R").options.item(0).value === "R"){
+            document.getElementById("R").options.remove(0)
+        }
         drawCanvas(r);
     }
 
@@ -396,6 +387,41 @@
 
     function validation() {
         let textarea = document.getElementById("textarea").value
+    }
+
+    function request(x, y, r) {
+        let data = {
+            "x": x,
+            "y": y,
+            "r": r
+        };
+        $.ajax({
+            type: "POST",
+            url: "controllerServlet",
+            data: data,
+            dataType: 'json',
+            success: function (data) {
+                let tr = document.createElement("tr");
+                tr.innerHTML = '<td>' + data.x + '</td><td>' + data.y + '</td><td>' + data.r + '</td><td style="background-color: ' + (data.result === "true" ? "lightgreen" : "lightcoral") + '">' + data.result + '</td>';
+                document.getElementById("table").appendChild(tr);
+            }
+        })
+    }
+
+    function collectParameters() {
+
+    }
+
+    function getCheckedCheckBoxes() {
+        var checkboxes = document.getElementsByClassName('checkbox');
+        var checkboxesChecked = []; // можно в массиве их хранить, если нужно использовать
+        for (var index = 0; index < checkboxes.length; index++) {
+            if (checkboxes[index].checked) {
+                checkboxesChecked.push(checkboxes[index].value); // положим в массив выбранный
+                alert(checkboxes[index].value); // делайте что нужно - это для наглядности
+            }
+        }
+        return checkboxesChecked; // для использования в нужном месте
     }
 </script>
 </html>

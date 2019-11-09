@@ -1,7 +1,5 @@
 import beans.Point;
 import beans.PointBean;
-
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -28,8 +26,18 @@ public class ControllerServlet extends HttpServlet {
         }
     }
 
-//    @Override
-//    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-//        if(req.getMethod())
-//    }
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        double x = Double.parseDouble(req.getParameter("x"));
+        double y = Double.parseDouble(req.getParameter("y"));
+        double r = Double.parseDouble(req.getParameter("r"));
+        if (req.getServletContext().getAttribute("array") == null) {
+            PointBean array = new PointBean();
+            array.addValue(x,y,r);
+            req.getServletContext().setAttribute("array", array);
+        } else {
+            ((PointBean)getServletContext().getAttribute("array")).addValue(x,y,r);
+        }
+        resp.getWriter().write(new Point(x, y, r).toJson());
+    }
 }
