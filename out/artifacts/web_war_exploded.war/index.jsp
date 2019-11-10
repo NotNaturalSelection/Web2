@@ -132,6 +132,10 @@
         .table {
             padding-top: 12%;
         }
+
+        #checkboxes {
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -144,33 +148,44 @@
         <div class="form">
             <form action="controllerServlet" method="get" id="form">
                 <p>Координата X</p>
-                <label>
-                    <input type="checkbox" name="checkbox[]" value="-3"/>-3
-                </label>
-                <label>
-                    <input type="checkbox" name="checkbox[]" value="-2"/>-2
-                </label>
-                <label>
-                    <input type="checkbox" name="checkbox[]" value="-1"/>-1
-                </label>
-                <label>
-                    <input type="checkbox" name="checkbox[]" value="0"/>0
-                </label>
-                <label>
-                    <input type="checkbox" name="checkbox[]" value="1"/>1
-                </label>
-                <label>
-                    <input type="checkbox" name="checkbox[]" value="2"/>2
-                </label>
-                <label>
-                    <input type="checkbox" name="checkbox[]" value="3"/>3
-                </label>
-                <label>
-                    <input type="checkbox" name="checkbox[]" value="4"/>4
-                </label>
-                <label>
-                    <input type="checkbox" name="checkbox[]" value="5"/>5
-                </label>
+                <div id="checkboxes">
+                    <label>
+                        <input type="checkbox" class="checkbox" name="checkbox[]" value="-3"
+                               onclick="checkboxOnClick()"/>-3
+                    </label>
+                    <label>
+                        <input type="checkbox" class="checkbox" name="checkbox[]" value="-2"
+                               onclick="checkboxOnClick()"/>-2
+                    </label>
+                    <label>
+                        <input type="checkbox" class="checkbox" name="checkbox[]" value="-1"
+                               onclick="checkboxOnClick()"/>-1
+                    </label>
+                    <label>
+                        <input type="checkbox" class="checkbox" name="checkbox[]" value="0"
+                               onclick="checkboxOnClick()"/>0
+                    </label>
+                    <label>
+                        <input type="checkbox" class="checkbox" name="checkbox[]" value="1"
+                               onclick="checkboxOnClick()"/>1
+                    </label>
+                    <label>
+                        <input type="checkbox" class="checkbox" name="checkbox[]" value="2"
+                               onclick="checkboxOnClick()"/>2
+                    </label>
+                    <label>
+                        <input type="checkbox" class="checkbox" name="checkbox[]" value="3"
+                               onclick="checkboxOnClick()"/>3
+                    </label>
+                    <label>
+                        <input type="checkbox" class="checkbox" name="checkbox[]" value="4"
+                               onclick="checkboxOnClick()"/>4
+                    </label>
+                    <label>
+                        <input type="checkbox" class="checkbox" name="checkbox[]" value="5"
+                               onclick="checkboxOnClick()"/>5
+                    </label>
+                </div>
                 <p>Координата Y</p>
                 <label for="textarea"></label><input type="text" placeholder="-3...5" name="textarea" id="textarea"
                                                      onkeydown="if(event.keyCode===13){return false;}"
@@ -185,7 +200,7 @@
                     <option value="2.5">2.5</option>
                     <option value="3">3</option>
                 </select>
-                <p><input type="submit" id="accept" value="Применить"></p>
+                <p><input type="button" id="accept" value="Применить" onclick="validation()"></p>
             </form>
         </div>
     </div>
@@ -230,7 +245,7 @@
         drawCanvas(R);
         let r = parseFloat(R).toFixed(3);
         if (isNaN(r)) {
-            document.getElementById("R").style = 'background-color: #ff8282;';
+            document.getElementById("R").style = 'background-color: lightcoral;';
             let incr = 1;
             while (incr < document.getElementById("R").options.length) {
                 document.getElementById("R").options.item(incr).style = 'background-color: lightblue;';
@@ -371,7 +386,7 @@
 
     function setR(r) {
         document.getElementById("R").style = 'background-color: lightblue;';
-        if(document.getElementById("R").options.item(0).value === "R"){
+        if (document.getElementById("R").options.item(0).value === "R") {
             document.getElementById("R").options.remove(0)
         }
         drawCanvas(r);
@@ -383,10 +398,49 @@
             input = input.replace(',', '.');
             document.getElementById("textarea").value = input.toString();
         }
+        input = Number(input);
+        if (input > 5 || input < -3) {
+            document.getElementById("textarea").style = 'background-color: lightcoral;';
+        } else {
+            document.getElementById("textarea").style = 'background-color: lightblue;';
+        }
     }
 
     function validation() {
-        let textarea = document.getElementById("textarea").value
+        let result = true;
+        if (!checkboxesValidation()) {
+            result = false;
+        }
+        if (!textareaValidation()) {
+            document.getElementById("textarea").style = 'background-color: lightcoral;';
+            result = false;
+        }
+        if (!selectValidation()) {
+            document.getElementById("R").style = 'background-color: lightcoral;';
+            result = false;
+        }
+        if(result){
+            document.forms.item(0).submit();
+        }
+    }
+
+    function checkboxesValidation() {
+        if (getCheckedCheckBoxes().length > 0) {
+            document.getElementById("checkboxes").style = 'background-color: lightblue;';
+            return true;
+        } else {
+            document.getElementById("checkboxes").style = 'background-color: lightcoral;';
+            return false;
+        }
+    }
+
+    function textareaValidation() {
+        let textarea = document.getElementById("textarea").value;
+        return textarea <= 5 && textarea >= -3;
+    }
+
+    function selectValidation() {
+        return document.getElementById("R").value !== "R";
     }
 
     function request(x, y, r) {
@@ -408,20 +462,23 @@
         })
     }
 
-    function collectParameters() {
-
-    }
-
     function getCheckedCheckBoxes() {
         var checkboxes = document.getElementsByClassName('checkbox');
         var checkboxesChecked = []; // можно в массиве их хранить, если нужно использовать
         for (var index = 0; index < checkboxes.length; index++) {
             if (checkboxes[index].checked) {
                 checkboxesChecked.push(checkboxes[index].value); // положим в массив выбранный
-                alert(checkboxes[index].value); // делайте что нужно - это для наглядности
             }
         }
         return checkboxesChecked; // для использования в нужном месте
+    }
+
+    function checkboxOnClick() {
+        if (getCheckedCheckBoxes().length > 0) {
+            document.getElementById("checkboxes").style = 'background-color: lightblue;';
+        } else {
+            document.getElementById("checkboxes").style = 'background-color: lightcoral;';
+        }
     }
 </script>
 </html>
