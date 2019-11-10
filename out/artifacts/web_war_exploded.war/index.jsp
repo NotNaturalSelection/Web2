@@ -201,6 +201,7 @@
                     <option value="3">3</option>
                 </select>
                 <p><input type="button" id="accept" value="Применить" onclick="validation()"></p>
+                <input type="hidden" name="type" value="form">
             </form>
         </div>
     </div>
@@ -398,8 +399,7 @@
             input = input.replace(',', '.');
             document.getElementById("textarea").value = input.toString();
         }
-        input = Number(input);
-        if (input > 5 || input < -3) {
+        if (input >= 5 || input <= -3 || input === "" || isNaN(Number(input))) {
             document.getElementById("textarea").style = 'background-color: lightcoral;';
         } else {
             document.getElementById("textarea").style = 'background-color: lightblue;';
@@ -436,7 +436,10 @@
 
     function textareaValidation() {
         let textarea = document.getElementById("textarea").value;
-        return textarea <= 5 && textarea >= -3;
+        if(textarea === ""){
+            document.getElementById("textarea").style = 'background-color: lightcoral;';
+        }
+        return textarea < 5 && textarea > -3 && textarea !== "";
     }
 
     function selectValidation() {
@@ -445,12 +448,13 @@
 
     function request(x, y, r) {
         let data = {
+            "type": "ajax",
             "x": x,
             "y": y,
             "r": r
         };
         $.ajax({
-            type: "POST",
+            type: "GET",
             url: "controllerServlet",
             data: data,
             dataType: 'json',
