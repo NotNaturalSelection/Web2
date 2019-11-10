@@ -1,18 +1,16 @@
 package beans;
 
-import static java.lang.Math.pow;
-
 public class Point {
     private double x;
     private double y;
     private double r;
     private boolean hit;
 
-    public Point(double x, double y, double r) {
+    public Point(double x, double y, double r, boolean hit) {
         this.x = x;
         this.y = y;
         this.r = r;
-        this.hit = isHit(x,y,r);
+        this.hit = hit;
     }
 
     public double getX() {
@@ -66,17 +64,4 @@ public class Point {
                         "}";
     }
 
-    public static boolean isHit(double numberX, double numberY, double numberR) {
-        boolean result = false;
-        if (numberX <= 0 && numberY >= 0 && numberY - numberX <= numberR) {
-            result = true;
-        }
-        if (numberX <= 0 && numberY <= 0 && pow(numberX, 2d) + pow(numberY, 2d) <= pow(numberR / 2, 2d)) {
-            result = true;
-        }
-        if (numberX >= 0 && numberY >= 0 && numberX <= numberR && numberY <= numberR / 2) {
-            result = true;
-        }
-        return result;
-    }
 }

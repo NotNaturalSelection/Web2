@@ -18,11 +18,7 @@ public class PointBean implements Serializable {
         this.array = array;
     }
 
-    public void addValue(double x, double y, double r) {
-//        Point[] points = new Point[getArray().size()+1];
-//        points = getArray().toArray(points);
-//        points[points.length-1] = new Point(x,y,r,is);
-//        Collections.addAll(array, points);
-        array.add(new Point(x, y, r));
+    public void addValue(double x, double y, double r, boolean hit) {
+        array.add(new Point(x, y, r, hit));
     }
 }

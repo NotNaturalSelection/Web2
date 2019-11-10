@@ -11,15 +11,8 @@ import java.io.IOException;
 public class ControllerServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("text/html");
-        if (req.getServletContext().getAttribute("array") == null) {
-            PointBean array = new PointBean();
-            req.getServletContext().setAttribute("array", array);
-        }
-        String[] x = req.getParameterValues("checkbox[]");
-        String y = req.getParameter("textarea");
-        String r = req.getParameter("select");
-        if (x != null && y != null & r != null) {
+        initializeBean(req);
+        if (req.getParameterValues("checkbox[]") != null && req.getParameter("textarea") != null & req.getParameter("select") != null) {
             req.getRequestDispatcher("areaCheckServlet").forward(req, resp);
         } else {
             req.getRequestDispatcher("index.jsp").forward(req, resp);
@@ -28,16 +21,13 @@ public class ControllerServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        double x = Double.parseDouble(req.getParameter("x"));
-        double y = Double.parseDouble(req.getParameter("y"));
-        double r = Double.parseDouble(req.getParameter("r"));
+        req.getRequestDispatcher("areaCheckServlet").forward(req, resp);
+    }
+
+    protected void initializeBean(HttpServletRequest req){
         if (req.getServletContext().getAttribute("array") == null) {
             PointBean array = new PointBean();
-            array.addValue(x,y,r);
             req.getServletContext().setAttribute("array", array);
-        } else {
-            ((PointBean)getServletContext().getAttribute("array")).addValue(x,y,r);
         }
-        resp.getWriter().write(new Point(x, y, r).toJson());
     }
 }
