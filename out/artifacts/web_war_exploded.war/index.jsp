@@ -6,6 +6,16 @@
     <title>Title</title>
     <script src="js/jquery.js"></script>
     <style>
+        table+p {
+            margin-left: 25%;
+            margin-right: 25%;
+            width: 50%;
+            text-align: center;
+            background-color: lightblue;
+            border-radius: 5px;
+            border: solid grey 1px;
+        }
+
         input[type=checkbox] {
             cursor: pointer;
             width: 15px;
@@ -208,6 +218,7 @@
     <div class="table">
         <table id="table">
             <%
+                int i = 1;
                 StringBuilder builder = new StringBuilder();
                 builder.append("<tr>");
                 builder.append("<th>").append("X").append("</th>");
@@ -226,10 +237,12 @@
                         builder.append("<td style='background-color: lightcoral;'>").append(point.isHit()).append("</td>");
                     }
                     builder.append("</tr>");
+                    i++;
                 }
                 out.println(builder.toString());
             %>
         </table>
+        <p><a type='text/html' href='https://github.com/NotNaturalSelection/Web2/' target='_blank'>Code on GitHub</a></p>
     </div>
 </main>
 </body>
@@ -419,8 +432,8 @@
             document.getElementById("R").style = 'background-color: lightcoral;';
             result = false;
         }
-        if(result){
-            document.forms.item(0).submit();
+        if (result) {
+            request(getCheckedCheckBoxes(), document.getElementById("textarea").value, document.getElementById("R").value)
         }
     }
 
@@ -436,7 +449,7 @@
 
     function textareaValidation() {
         let textarea = document.getElementById("textarea").value;
-        if(textarea === ""){
+        if (textarea === "") {
             document.getElementById("textarea").style = 'background-color: lightcoral;';
         }
         return textarea < 5 && textarea > -3 && textarea !== "";
@@ -449,19 +462,24 @@
     function request(x, y, r) {
         let data = {
             "type": "ajax",
-            "x": x,
-            "y": y,
-            "r": r
+            "checkbox[]": Array.isArray(x) ? x : [x],
+            "textarea": y,
+            "select": r
         };
         $.ajax({
             type: "GET",
             url: "controllerServlet",
             data: data,
-            dataType: 'json',
+            dataType: 'text',
             success: function (data) {
-                let tr = document.createElement("tr");
-                tr.innerHTML = '<td>' + data.x + '</td><td>' + data.y + '</td><td>' + data.r + '</td><td style="background-color: ' + (data.result === "true" ? "lightgreen" : "lightcoral") + '">' + data.result + '</td>';
-                document.getElementById("table").appendChild(tr);
+                let index = 0;
+                data = Array(data);
+                let res = JSON.parse(data);
+                for (index; index < res.length; index++) {
+                    let tr = document.createElement("tr");
+                    tr.innerHTML = '<td>' + res[index].x + '</td><td>' + res[index].y + '</td><td>' + res[index].r + '</td><td style="background-color: ' + (res[index].result === "true" ? "lightgreen" : "lightcoral") + '">' + res[index].result + '</td>';
+                    document.getElementById("table").appendChild(tr);
+                }
             }
         })
     }

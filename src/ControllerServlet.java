@@ -1,3 +1,4 @@
+import beans.ErrorBean;
 import beans.PointBean;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -5,34 +6,24 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 
 @WebServlet(name = "ControllerServlet", urlPatterns = "controllerServlet")
 public class ControllerServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         initializeBean(req);
-        if (req.getParameter("type") != null) {
-            if (req.getParameter("type").equals("form")) {
-                String[] x = req.getParameterValues("checkbox[]");
-                String y = req.getParameter("textarea");
-                String r = req.getParameter("select");
-                if (x != null && y != null & r != null) {
-                    boolean hasOkParams = false;
-                    for (String strX : x) {
-                        if (isNumeric(strX) && isInt(Double.parseDouble(strX))) {
-                            hasOkParams = true;
-                        }
-                    }
-                    if (isNumeric(y) && isNumeric(r) && hasOkParams) {
-                        req.getRequestDispatcher("areaCheckServlet").forward(req, resp);
-                    } else {
-                        resp.sendRedirect("index.jsp");//todo добавить сообщение о некорректных данных
-                    }
+        if (hasParameters(req)) {
+            if (hasRequiredParameters(req)) {
+                if (hasCorrectParameters(req)) {
+                    req.getRequestDispatcher("areaCheckServlet").forward(req, resp);
                 } else {
-                    resp.sendRedirect("index.jsp");
+                    ((ErrorBean)getServletContext().getAttribute("errors")).addError("Параметры запроса некорректны");
+                    resp.sendRedirect("error.jsp");
                 }
             } else {
-                req.getRequestDispatcher("areaCheckServlet").forward(req, resp);
+                ((ErrorBean)getServletContext().getAttribute("errors")).addError("В запросе нет необходимых параметров");
+                resp.sendRedirect("error.jsp");
             }
         } else {
             resp.sendRedirect("index.jsp");
@@ -40,9 +31,13 @@ public class ControllerServlet extends HttpServlet {
     }
 
     private void initializeBean(HttpServletRequest req) {
-        if (req.getServletContext().getAttribute("array") == null) {
+        if (getServletContext().getAttribute("array") == null) {
             PointBean array = new PointBean();
-            req.getServletContext().setAttribute("array", array);
+            getServletContext().setAttribute("array", array);
+        }
+        if (getServletContext().getAttribute("errors") == null) {
+            ErrorBean errors = new ErrorBean();
+            getServletContext().setAttribute("errors", errors);
         }
     }
 
@@ -54,12 +49,57 @@ public class ControllerServlet extends HttpServlet {
         return number == (int) number;
     }
 
-    private boolean isNumeric(String str) {
+    static boolean isNumeric(String str) {
         try {
             Double.parseDouble(str);
             return true;
         } catch (NumberFormatException e) {
             return false;
         }
+    }
+
+    private boolean hasRequiredParameters(HttpServletRequest req) {
+        Map<String, String[]> map = req.getParameterMap();
+        return (map.containsKey("textarea") && map.containsKey("checkbox[]") && map.containsKey("select"));
+    }
+
+    private boolean hasParameters(HttpServletRequest req) {
+        return !req.getParameterMap().isEmpty();
+    }
+
+    private boolean hasCorrectParameters(HttpServletRequest req) {
+        return isTextareaCorrect(req) && isSelectCorrect(req) && isCheckboxCorrect(req);
+    }
+
+    private boolean isTextareaCorrect(HttpServletRequest req) {
+        String param = req.getParameter("textarea");
+        if (isNumeric(param)) {
+            double p = Double.parseDouble(param);
+            return !(p >= 5 || p <= -3);
+        }
+        return false;
+    }
+
+    private boolean isSelectCorrect(HttpServletRequest req) {
+        String param = req.getParameter("select");
+        if (isNumeric(param)) {
+            double p = Double.parseDouble(param);
+            return !(p > 3 || p < 1);
+        }
+        return false;
+    }
+
+    private boolean isCheckboxCorrect(HttpServletRequest req) {
+        String[] x = req.getParameterValues("checkbox[]");
+        boolean hasOkParams = false;
+        for (String strX : x) {
+            if (isNumeric(strX)) {
+                double p = Double.parseDouble(strX);
+                if (!(p >= 5 || p <= -3)) {
+                    hasOkParams = true;
+                }
+            }
+        }
+        return hasOkParams;
     }
 }

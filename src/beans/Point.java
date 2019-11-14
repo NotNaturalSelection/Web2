@@ -64,4 +64,15 @@ public class Point {
                         "}";
     }
 
+    public static String toJsonArray(Point[] points){
+        StringBuilder result = new StringBuilder("[");
+        for (Point point:points) {
+            result.append(point.toJson());
+            result.append(",");
+        }
+        result.deleteCharAt(result.length()-1);
+        result.append("]");
+        return  result.toString();
+    }
+
 }
