@@ -13,7 +13,7 @@ import java.util.List;
 
 import static java.lang.Math.pow;
 
-@WebServlet(name = "AreaCheckServlet", urlPatterns = "areaCheckServlet")
+@WebServlet(name = "AreaCheckServlet", urlPatterns = "/WEB-INF/areaCheckServlet")
 public class AreaCheckServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

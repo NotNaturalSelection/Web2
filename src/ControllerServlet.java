@@ -12,32 +12,54 @@ import java.util.Map;
 public class ControllerServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        initializeBean(req);
+        initializeBeans(req);
         if (hasParameters(req)) {
             if (hasRequiredParameters(req)) {
                 if (hasCorrectParameters(req)) {
-                    req.getRequestDispatcher("areaCheckServlet").forward(req, resp);
+                    req.getRequestDispatcher("/WEB-INF/areaCheckServlet").forward(req, resp);
                 } else {
-                    ((ErrorBean)getServletContext().getAttribute("errors")).addError("Параметры запроса некорректны");
-                    resp.sendRedirect("error.jsp");
+                    ErrorBean errorBean = (ErrorBean)req.getAttribute("errors");
+                    searchErrors(req,errorBean);
+//                    if(!isCheckboxCorrect(req)) {
+//                        errorBean.addError("Параметр \"X\" некорректен");
+//                    }
+//                    if(!isTextareaCorrect(req)) {
+//                        errorBean.addError("Параметр \"Y\" некорректен");
+//                    }
+//                    if(!isSelectCorrect(req)) {
+//                        errorBean.addError("Параметр \"R\" некорректен");
+//                    }
+//                    resp.sendRedirect("error.jsp");
+                    req.getRequestDispatcher("/WEB-INF/error.jsp").forward(req, resp);
                 }
             } else {
-                ((ErrorBean)getServletContext().getAttribute("errors")).addError("В запросе нет необходимых параметров");
-                resp.sendRedirect("error.jsp");
+                ErrorBean errorBean = (ErrorBean)req.getAttribute("errors");
+//                if(!hasParameter(req,"checkbox[]")) {
+//                    ((ErrorBean) req.getAttribute("errors")).addError("В запросе нет параметров \"X\"");
+//                }
+//                if(!hasParameter(req,"textarea")) {
+//                    ((ErrorBean) req.getAttribute("errors")).addError("В запросе нет параметра \"Y\"");
+//                }
+//                if(!hasParameter(req,"select")) {
+//                    ((ErrorBean) req.getAttribute("errors")).addError("В запросе нет параметра \"R\"");
+//                }
+                searchErrors(req, errorBean);
+                req.getRequestDispatcher("/WEB-INF/error.jsp").forward(req, resp);
+//                resp.sendRedirect("error.jsp");
             }
         } else {
             resp.sendRedirect("index.jsp");
         }
     }
 
-    private void initializeBean(HttpServletRequest req) {
+    private void initializeBeans(HttpServletRequest req) {
         if (getServletContext().getAttribute("array") == null) {
             PointBean array = new PointBean();
             getServletContext().setAttribute("array", array);
         }
-        if (getServletContext().getAttribute("errors") == null) {
+        if (req.getAttribute("errors") == null) {
             ErrorBean errors = new ErrorBean();
-            getServletContext().setAttribute("errors", errors);
+            req.setAttribute("errors", errors);
         }
     }
 
@@ -53,7 +75,7 @@ public class ControllerServlet extends HttpServlet {
         try {
             Double.parseDouble(str);
             return true;
-        } catch (NumberFormatException e) {
+        } catch (Exception e) {
             return false;
         }
     }
@@ -101,5 +123,37 @@ public class ControllerServlet extends HttpServlet {
             }
         }
         return hasOkParams;
+    }
+
+    private boolean hasParameter(HttpServletRequest req, String parameterName){
+        return (req.getParameter(parameterName)!= null);
+    }
+
+    private void searchErrors(HttpServletRequest req, ErrorBean errorBean){
+        if(!hasParameter(req,"checkbox[]")) {
+            ((ErrorBean) req.getAttribute("errors")).addError("В запросе нет параметров \"X\"");
+        } else {
+            if(!isCheckboxCorrect(req)) {
+                errorBean.addError("Параметр \"X\" некорректен");
+            }
+        }
+
+
+        if(!hasParameter(req,"textarea")) {
+            ((ErrorBean) req.getAttribute("errors")).addError("В запросе нет параметра \"Y\"");
+        } else {
+            if(!isTextareaCorrect(req)) {
+                errorBean.addError("Параметр \"Y\" некорректен");
+            }
+        }
+
+
+        if(!hasParameter(req,"select")) {
+            ((ErrorBean) req.getAttribute("errors")).addError("В запросе нет параметра \"R\"");
+        } else {
+            if(!isSelectCorrect(req)) {
+                errorBean.addError("Параметр \"R\" некорректен");
+            }
+        }
     }
 }
